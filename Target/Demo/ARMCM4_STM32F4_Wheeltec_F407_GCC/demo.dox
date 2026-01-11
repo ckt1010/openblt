@@ -1,0 +1,8 @@
+/**
+\defgroup   ARMCM4_STM32F4_Wheeltec_F407_GCC Demo for Wheeltec_F407/GCC
+\ingroup    Demos
+\brief      Preconfigured programs for the Wheeltec_F407 board and the GNU ARM GCC compiler.
+\details    For detailed getting started instructions, refer to:
+*/
+
+
