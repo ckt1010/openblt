@@ -181,6 +181,7 @@ void HAL_MspInit(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
 
 #if (BOOT_COM_RS232_ENABLE > 0)
@@ -194,12 +195,12 @@ void HAL_MspInit(void)
 #endif
 
   /* Configure GPIO pin for the LED. */
-  GPIO_InitStruct.Pin = GPIO_PIN_7;
+  GPIO_InitStruct.Pin = GPIO_PIN_8;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_RESET);
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
 
   /* Configure GPIO pin for (optional) backdoor entry input. */
   GPIO_InitStruct.Pin = GPIO_PIN_13;
@@ -256,10 +257,10 @@ void HAL_MspDeInit(void)
   HAL_RCC_DeInit();
 
   /* Reset GPIO pin for the LED to turn it off. */
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_SET);
 
   /* Deinit used GPIOs. */
-  HAL_GPIO_DeInit(GPIOB, GPIO_PIN_7);
+  HAL_GPIO_DeInit(GPIOE, GPIO_PIN_8);
   HAL_GPIO_DeInit(GPIOC, GPIO_PIN_13);
 
 #if (BOOT_COM_USB_ENABLE > 0)
