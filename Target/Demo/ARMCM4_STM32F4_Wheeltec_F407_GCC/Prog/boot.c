@@ -130,7 +130,7 @@ static unsigned char Rs232ReceiveByte(unsigned char *data);
 static void BootComRs232Init(void)
 {
   /* Configure UART peripheral. */
-  rs232Handle.Instance = USART3;
+  rs232Handle.Instance = USART1;
   rs232Handle.Init.BaudRate = BOOT_COM_RS232_BAUDRATE;
   rs232Handle.Init.WordLength = UART_WORDLENGTH_8B;
   rs232Handle.Init.StopBits = UART_STOPBITS_1;

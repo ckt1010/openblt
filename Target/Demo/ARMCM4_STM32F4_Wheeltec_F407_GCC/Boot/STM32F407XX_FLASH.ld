@@ -64,7 +64,7 @@ MEMORY
 SHARED (xrw)    : ORIGIN = 0x20000000, LENGTH = 64
 RAM (xrw)      : ORIGIN = 0x20000040, LENGTH = 128K - 64
 CCMRAM (xrw)      : ORIGIN = 0x10000000, LENGTH = 64K
-FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 512K
+FLASH (rx)      : ORIGIN = 0x8000000, LENGTH = 32K
 }
 
 /* Define output sections */
