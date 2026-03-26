@@ -120,6 +120,9 @@ CFLAGS      = $(STDFLAGS) $(OPTFLAGS)
 CFLAGS     += -DUSE_HAL_DRIVER -DSTM32F407xx
 CFLAGS     += -D__weak="__attribute__((weak))" -D__packed="__attribute__((__packed__))"
 CFLAGS     += $(INC_PATH)
+ifneq ($(strip $(EXTRA_CFLAGS)),)
+CFLAGS     += $(EXTRA_CFLAGS)
+endif
 AFLAGS      = $(CFLAGS)
 LFLAGS      = $(STDFLAGS) $(OPTFLAGS)
 LFLAGS     += -T"STM32F407XX_FLASH.ld" -Wl,-Map=$(BIN_PATH)/$(PROJ_NAME).map
@@ -159,6 +162,7 @@ $(BIN_PATH)/$(PROJ_NAME).srec : $(BIN_PATH)/$(PROJ_NAME).elf
 $(BIN_PATH)/$(PROJ_NAME).elf : $(AOBJS) $(COBJS) 
 	@echo +++ Linking [$(notdir $@)]
 	@$(LN) $(LFLAGS) -o $@ $(patsubst %.o,$(OBJ_PATH)/%.o,$(^F)) $(LIBS)
+	@python3 patch_openblt_checksum.py $@
 
 
 #|--------------------------------------------------------------------------------------|

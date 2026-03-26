@@ -82,7 +82,7 @@ blt_bool CpuUserProgramStartHook(void)
    * force the bootloader to stay active after reset, keep the pushbutton pressed while
    * resetting the microcontroller.
    */
-  if (HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == GPIO_PIN_SET)
+  if (HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_0) == GPIO_PIN_RESET)
   {
     /* pushbutton pressed, so do not start the user program and keep the
      * bootloader active instead.

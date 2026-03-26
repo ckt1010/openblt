@@ -32,6 +32,7 @@
 * Function prototypes
 ****************************************************************************************/
 void LedInit(void);
+void LedOn(void);
 void LedToggle(void);
 
 

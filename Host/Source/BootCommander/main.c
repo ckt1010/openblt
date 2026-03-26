@@ -34,6 +34,12 @@
 #include <stdlib.h>                         /* for standard library                    */
 #include <stdio.h>                          /* Standard I/O functions.                 */
 #include <string.h>                         /* for string library                      */
+#if defined (PLATFORM_LINUX)
+#include <unistd.h>                         /* for usleep()                            */
+#include <fcntl.h>                          /* for open()                              */
+#include <termios.h>                        /* for POSIX serial port configuration     */
+#include <sys/ioctl.h>                      /* for modem-control ioctls                */
+#endif
 #include "openblt.h"                        /* OpenBLT host library.                   */
 
 
@@ -127,6 +133,135 @@ static char const * const ExtractFirmwareFileFromCommandLine(int argc,
 static char const * GetLineTrailerByResult(tTrailerResult trailerResult);
 static char const * GetLineTrailerByPercentage(uint8_t percentage);
 static void ErasePercentageTrailer(void);
+#if defined (PLATFORM_LINUX)
+static bool AttemptXcpRs232BackdoorEntry(
+                              tBltSessionSettingsXcpV10 const * sessionSettings,
+                              tBltTransportSettingsXcpV10Rs232 const * transportSettings);
+#endif
+
+
+#if defined (PLATFORM_LINUX)
+/************************************************************************************//**
+** \brief     Sends a raw XCP CONNECT frame on RS232 to trigger application backdoor
+**            logic, then waits a short while for the target to reset into bootloader.
+** \return    True if the frame was transmitted, false otherwise.
+**
+****************************************************************************************/
+static bool AttemptXcpRs232BackdoorEntry(
+                              tBltSessionSettingsXcpV10 const * sessionSettings,
+                              tBltTransportSettingsXcpV10Rs232 const * transportSettings)
+{
+  bool result = false;
+  int fd = -1;
+  struct termios options = { 0 };
+  int modemControl = TIOCM_DTR | TIOCM_RTS;
+  speed_t baudrate = B0;
+  uint8_t backdoorPacket[4] = { 2u, 0xFFu, 0u, 0u };
+  uint8_t backdoorPacketLen = 3u;
+
+  if ( (sessionSettings == NULL) || (transportSettings == NULL) ||
+       (transportSettings->portName == NULL) )
+  {
+    return false;
+  }
+
+  switch (transportSettings->baudrate)
+  {
+    case 115200u:
+      baudrate = B115200;
+      break;
+
+    case 57600u:
+      baudrate = B57600;
+      break;
+
+    case 38400u:
+      baudrate = B38400;
+      break;
+
+    case 19200u:
+      baudrate = B19200;
+      break;
+
+    case 9600u:
+      baudrate = B9600;
+      break;
+
+    default:
+      return false;
+  }
+
+  fd = open(transportSettings->portName, O_RDWR | O_NOCTTY | O_NDELAY);
+  if (fd == -1)
+  {
+    return false;
+  }
+
+  if (fcntl(fd, F_SETFL, 0) == -1)
+  {
+    goto done;
+  }
+  (void)ioctl(fd, TIOCMBIC, &modemControl);
+  if (tcgetattr(fd, &options) == -1)
+  {
+    goto done;
+  }
+  if (cfsetispeed(&options, baudrate) == -1)
+  {
+    goto done;
+  }
+  if (cfsetospeed(&options, baudrate) == -1)
+  {
+    goto done;
+  }
+
+  options.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+  options.c_oflag &= ~(OPOST);
+  options.c_cflag &= ~(CSIZE | PARENB | PARODD | CSTOPB | HUPCL);
+  options.c_cflag |= (CS8 | CLOCAL | CREAD);
+  options.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
+  options.c_cc[VMIN]  = 0;
+  options.c_cc[VTIME] = 1;
+  if (tcsetattr(fd, TCSAFLUSH, &options) == -1)
+  {
+    goto done;
+  }
+  (void)ioctl(fd, TIOCMBIC, &modemControl);
+  tcflush(fd, TCIOFLUSH);
+  backdoorPacket[2] = sessionSettings->connectMode;
+  if (transportSettings->csType == 1u)
+  {
+    backdoorPacket[3] = (uint8_t)(backdoorPacket[0] + backdoorPacket[1] +
+                                  backdoorPacket[2]);
+    backdoorPacketLen = 4u;
+  }
+
+  if (write(fd, backdoorPacket, backdoorPacketLen) != backdoorPacketLen)
+  {
+    goto done;
+  }
+  if (tcdrain(fd) == -1)
+  {
+    goto done;
+  }
+
+  result = true;
+
+done:
+  if (fd != -1)
+  {
+    (void)ioctl(fd, TIOCMBIC, &modemControl);
+  }
+  tcflush(fd, TCIOFLUSH);
+  close(fd);
+
+  if (result)
+  {
+    usleep(1000000);
+  }
+  return result;
+} /*** end of AttemptXcpRs232BackdoorEntry ***/
+#endif
 
 
 /************************************************************************************//**
@@ -294,11 +429,31 @@ int main(int argc, char const * const argv[])
       /* No response. Prompt the user to reset the system. */
       printf("Attempting backdoor entry (reset system if this takes too long)...");
       (void)fflush(stdout);
+      #if defined (PLATFORM_LINUX)
+      if ( (appSessionType == BLT_SESSION_XCP_V10) &&
+           (appTransportType == BLT_TRANSPORT_XCP_V10_RS232) )
+      {
+        (void)AttemptXcpRs232BackdoorEntry(
+                  (tBltSessionSettingsXcpV10 const *)appSessionSettings,
+                  (tBltTransportSettingsXcpV10Rs232 const *)appTransportSettings);
+      }
+      #endif
+      /* Reinitialize the session before retrying. This mirrors the proven manual
+       * two-step workflow, where the application is first forced into the bootloader
+       * and a fresh BootCommander session is started afterwards.
+       */
+      BltSessionTerminate();
+      BltSessionInit(appSessionType,appSessionSettings,
+                     appTransportType, appTransportSettings);
       /* Now keep trying until we get a response. */
       while (BltSessionStart() != BLT_RESULT_OK)
       {
+        /* Start with a clean session/transport state for every retry. */
+        BltSessionTerminate();
         /* Delay a bit to not pump up the CPU load. */
         BltUtilTimeDelayMs(20);
+        BltSessionInit(appSessionType,appSessionSettings,
+                       appTransportType, appTransportSettings);
       }
     }
     tTrailerResult trailerResult = (result != RESULT_OK) ? \

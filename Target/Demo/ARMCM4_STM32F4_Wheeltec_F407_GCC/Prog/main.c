@@ -31,6 +31,125 @@
 ****************************************************************************************/
 #include "header.h"                                    /* generic header               */
 
+#if (BOOT_COM_RS232_CHANNEL_INDEX == 0)
+#define PROG_UART_CLK_ENABLE       __HAL_RCC_USART1_CLK_ENABLE
+#define PROG_UART_CLK_DISABLE      __HAL_RCC_USART1_CLK_DISABLE
+#define PROG_UART_GPIO_AF          GPIO_AF7_USART1
+#ifndef BOOT_RS232_USART1_PINSET
+#define BOOT_RS232_USART1_PINSET   (0)
+#endif
+#if (BOOT_RS232_USART1_PINSET == 0)
+#define PROG_UART_GPIO_PORT        GPIOA
+#define PROG_UART_GPIO_CLK_ENABLE  __HAL_RCC_GPIOA_CLK_ENABLE
+#define PROG_UART_GPIO_CLK_DISABLE __HAL_RCC_GPIOA_CLK_DISABLE
+#define PROG_UART_GPIO_PINS        (GPIO_PIN_9 | GPIO_PIN_10)
+#elif (BOOT_RS232_USART1_PINSET == 1)
+#define PROG_UART_GPIO_PORT        GPIOB
+#define PROG_UART_GPIO_CLK_ENABLE  __HAL_RCC_GPIOB_CLK_ENABLE
+#define PROG_UART_GPIO_CLK_DISABLE __HAL_RCC_GPIOB_CLK_DISABLE
+#define PROG_UART_GPIO_PINS        (GPIO_PIN_6 | GPIO_PIN_7)
+#else
+#error "Unsupported BOOT_RS232_USART1_PINSET value."
+#endif
+#elif (BOOT_COM_RS232_CHANNEL_INDEX == 1)
+#define PROG_UART_CLK_ENABLE       __HAL_RCC_USART2_CLK_ENABLE
+#define PROG_UART_CLK_DISABLE      __HAL_RCC_USART2_CLK_DISABLE
+#define PROG_UART_GPIO_AF          GPIO_AF7_USART2
+#ifndef BOOT_RS232_USART2_PINSET
+#define BOOT_RS232_USART2_PINSET   (0)
+#endif
+#if (BOOT_RS232_USART2_PINSET == 0)
+#define PROG_UART_GPIO_PORT        GPIOA
+#define PROG_UART_GPIO_CLK_ENABLE  __HAL_RCC_GPIOA_CLK_ENABLE
+#define PROG_UART_GPIO_CLK_DISABLE __HAL_RCC_GPIOA_CLK_DISABLE
+#define PROG_UART_GPIO_PINS        (GPIO_PIN_2 | GPIO_PIN_3)
+#elif (BOOT_RS232_USART2_PINSET == 1)
+#define PROG_UART_GPIO_PORT        GPIOD
+#define PROG_UART_GPIO_CLK_ENABLE  __HAL_RCC_GPIOD_CLK_ENABLE
+#define PROG_UART_GPIO_CLK_DISABLE __HAL_RCC_GPIOD_CLK_DISABLE
+#define PROG_UART_GPIO_PINS        (GPIO_PIN_5 | GPIO_PIN_6)
+#else
+#error "Unsupported BOOT_RS232_USART2_PINSET value."
+#endif
+#elif (BOOT_COM_RS232_CHANNEL_INDEX == 2)
+#define PROG_UART_CLK_ENABLE       __HAL_RCC_USART3_CLK_ENABLE
+#define PROG_UART_CLK_DISABLE      __HAL_RCC_USART3_CLK_DISABLE
+#define PROG_UART_GPIO_AF          GPIO_AF7_USART3
+#ifndef BOOT_RS232_USART3_PINSET
+#define BOOT_RS232_USART3_PINSET   (2)
+#endif
+#if (BOOT_RS232_USART3_PINSET == 0)
+#define PROG_UART_GPIO_PORT        GPIOB
+#define PROG_UART_GPIO_CLK_ENABLE  __HAL_RCC_GPIOB_CLK_ENABLE
+#define PROG_UART_GPIO_CLK_DISABLE __HAL_RCC_GPIOB_CLK_DISABLE
+#define PROG_UART_GPIO_PINS        (GPIO_PIN_10 | GPIO_PIN_11)
+#elif (BOOT_RS232_USART3_PINSET == 1)
+#define PROG_UART_GPIO_PORT        GPIOC
+#define PROG_UART_GPIO_CLK_ENABLE  __HAL_RCC_GPIOC_CLK_ENABLE
+#define PROG_UART_GPIO_CLK_DISABLE __HAL_RCC_GPIOC_CLK_DISABLE
+#define PROG_UART_GPIO_PINS        (GPIO_PIN_10 | GPIO_PIN_11)
+#elif (BOOT_RS232_USART3_PINSET == 2)
+#define PROG_UART_GPIO_PORT        GPIOD
+#define PROG_UART_GPIO_CLK_ENABLE  __HAL_RCC_GPIOD_CLK_ENABLE
+#define PROG_UART_GPIO_CLK_DISABLE __HAL_RCC_GPIOD_CLK_DISABLE
+#define PROG_UART_GPIO_PINS        (GPIO_PIN_8 | GPIO_PIN_9)
+#else
+#error "Unsupported BOOT_RS232_USART3_PINSET value."
+#endif
+#elif (BOOT_COM_RS232_CHANNEL_INDEX == 3)
+#define PROG_UART_CLK_ENABLE       __HAL_RCC_UART4_CLK_ENABLE
+#define PROG_UART_CLK_DISABLE      __HAL_RCC_UART4_CLK_DISABLE
+#define PROG_UART_GPIO_AF          GPIO_AF8_UART4
+#ifndef BOOT_RS232_UART4_PINSET
+#define BOOT_RS232_UART4_PINSET    (0)
+#endif
+#if (BOOT_RS232_UART4_PINSET == 0)
+#define PROG_UART_GPIO_PORT        GPIOA
+#define PROG_UART_GPIO_CLK_ENABLE  __HAL_RCC_GPIOA_CLK_ENABLE
+#define PROG_UART_GPIO_CLK_DISABLE __HAL_RCC_GPIOA_CLK_DISABLE
+#define PROG_UART_GPIO_PINS        (GPIO_PIN_0 | GPIO_PIN_1)
+#elif (BOOT_RS232_UART4_PINSET == 1)
+#define PROG_UART_GPIO_PORT        GPIOC
+#define PROG_UART_GPIO_CLK_ENABLE  __HAL_RCC_GPIOC_CLK_ENABLE
+#define PROG_UART_GPIO_CLK_DISABLE __HAL_RCC_GPIOC_CLK_DISABLE
+#define PROG_UART_GPIO_PINS        (GPIO_PIN_10 | GPIO_PIN_11)
+#else
+#error "Unsupported BOOT_RS232_UART4_PINSET value."
+#endif
+#elif (BOOT_COM_RS232_CHANNEL_INDEX == 4)
+#define PROG_UART_GPIO_PORT_TX       GPIOC
+#define PROG_UART_GPIO_PORT_RX       GPIOD
+#define PROG_UART_GPIO_CLK_ENABLE_TX __HAL_RCC_GPIOC_CLK_ENABLE
+#define PROG_UART_GPIO_CLK_ENABLE_RX __HAL_RCC_GPIOD_CLK_ENABLE
+#define PROG_UART_GPIO_CLK_DISABLE_TX __HAL_RCC_GPIOC_CLK_DISABLE
+#define PROG_UART_GPIO_CLK_DISABLE_RX __HAL_RCC_GPIOD_CLK_DISABLE
+#define PROG_UART_CLK_ENABLE        __HAL_RCC_UART5_CLK_ENABLE
+#define PROG_UART_CLK_DISABLE       __HAL_RCC_UART5_CLK_DISABLE
+#define PROG_UART_GPIO_PIN_TX       GPIO_PIN_12
+#define PROG_UART_GPIO_PIN_RX       GPIO_PIN_2
+#define PROG_UART_GPIO_AF           GPIO_AF8_UART5
+#elif (BOOT_COM_RS232_CHANNEL_INDEX == 5)
+#define PROG_UART_CLK_ENABLE       __HAL_RCC_USART6_CLK_ENABLE
+#define PROG_UART_CLK_DISABLE      __HAL_RCC_USART6_CLK_DISABLE
+#define PROG_UART_GPIO_AF          GPIO_AF8_USART6
+#ifndef BOOT_RS232_USART6_PINSET
+#define BOOT_RS232_USART6_PINSET   (0)
+#endif
+#if (BOOT_RS232_USART6_PINSET == 0)
+#define PROG_UART_GPIO_PORT        GPIOC
+#define PROG_UART_GPIO_CLK_ENABLE  __HAL_RCC_GPIOC_CLK_ENABLE
+#define PROG_UART_GPIO_CLK_DISABLE __HAL_RCC_GPIOC_CLK_DISABLE
+#define PROG_UART_GPIO_PINS        (GPIO_PIN_6 | GPIO_PIN_7)
+#elif (BOOT_RS232_USART6_PINSET == 1)
+#define PROG_UART_GPIO_PORT        GPIOG
+#define PROG_UART_GPIO_CLK_ENABLE  __HAL_RCC_GPIOG_CLK_ENABLE
+#define PROG_UART_GPIO_CLK_DISABLE __HAL_RCC_GPIOG_CLK_DISABLE
+#define PROG_UART_GPIO_PINS        (GPIO_PIN_9 | GPIO_PIN_14)
+#else
+#error "Unsupported BOOT_RS232_USART6_PINSET value."
+#endif
+#endif
+
 
 /****************************************************************************************
 * Function prototypes
@@ -52,8 +171,10 @@ int main(void)
   Init();
   /* Initialize the shared parameters module */
   SharedParamsInit();
+#if (BOOT_COM_NET_ENABLE > 0)
   /* initialize the network application */
   NetInit();
+#endif
   /* initialize the bootloader interface */
   BootComInit();
   /* the shared parameter at index 0 is used as a boolean flag to indicate if the
@@ -61,14 +182,16 @@ int main(void)
    * should be reset.
    */
   SharedParamsWriteByIndex(0, 0);
+  /* keep the app LED on while the application is running */
+  LedOn();
 
   /* start the infinite program loop */
   while (1)
   {
-    /* Toggle LED with a fixed frequency. */
-    LedToggle();
+#if (BOOT_COM_NET_ENABLE > 0)
     /* run the network task */ 
     NetTask();
+#endif
     /* check for bootloader activation request */
     BootComCheckActivationRequest();
   }
@@ -184,10 +307,11 @@ void HAL_MspInit(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
+  __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
 #if (BOOT_COM_RS232_ENABLE > 0)
   /* UART clock enable. */
-  __HAL_RCC_USART1_CLK_ENABLE();
+  PROG_UART_CLK_ENABLE();
 #endif
 #if (BOOT_COM_CAN_ENABLE > 0)
   /* CAN clock enable. */
@@ -219,12 +343,26 @@ void HAL_MspInit(void)
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 #if (BOOT_COM_RS232_ENABLE > 0)
   /* UART TX and RX GPIO pin configuration. */
-  GPIO_InitStruct.Pin = GPIO_PIN_9 | GPIO_PIN_10;
+#if (BOOT_COM_RS232_CHANNEL_INDEX == 4)
+  PROG_UART_GPIO_CLK_ENABLE_TX();
+  PROG_UART_GPIO_CLK_ENABLE_RX();
+  GPIO_InitStruct.Pin = PROG_UART_GPIO_PIN_TX;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  GPIO_InitStruct.Alternate = PROG_UART_GPIO_AF;
+  HAL_GPIO_Init(PROG_UART_GPIO_PORT_TX, &GPIO_InitStruct);
+  GPIO_InitStruct.Pin = PROG_UART_GPIO_PIN_RX;
+  HAL_GPIO_Init(PROG_UART_GPIO_PORT_RX, &GPIO_InitStruct);
+#else
+  PROG_UART_GPIO_CLK_ENABLE();
+  GPIO_InitStruct.Pin = PROG_UART_GPIO_PINS;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  GPIO_InitStruct.Alternate = PROG_UART_GPIO_AF;
+  HAL_GPIO_Init(PROG_UART_GPIO_PORT, &GPIO_InitStruct);
+#endif
 #endif
 #if (BOOT_COM_CAN_ENABLE > 0)
   /* CAN TX and RX GPIO pin configuration. */
@@ -253,7 +391,15 @@ void HAL_MspDeInit(void)
 #endif
 #if (BOOT_COM_RS232_ENABLE > 0)
   /* Reset UART GPIO pin configuration. */
-  HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9 | GPIO_PIN_10);
+#if (BOOT_COM_RS232_CHANNEL_INDEX == 4)
+  HAL_GPIO_DeInit(PROG_UART_GPIO_PORT_TX, PROG_UART_GPIO_PIN_TX);
+  HAL_GPIO_DeInit(PROG_UART_GPIO_PORT_RX, PROG_UART_GPIO_PIN_RX);
+  PROG_UART_GPIO_CLK_DISABLE_TX();
+  PROG_UART_GPIO_CLK_DISABLE_RX();
+#else
+  HAL_GPIO_DeInit(PROG_UART_GPIO_PORT, PROG_UART_GPIO_PINS);
+  PROG_UART_GPIO_CLK_DISABLE();
+#endif
 #endif 
   /* Deconfigure GPIO pin for the LED. */
   HAL_GPIO_WritePin(GPIOE, GPIO_PIN_8, GPIO_PIN_RESET);
@@ -265,7 +411,7 @@ void HAL_MspDeInit(void)
 #endif
 #if (BOOT_COM_RS232_ENABLE > 0)
   /* Peripheral clock disable. */
-  __HAL_RCC_USART1_CLK_DISABLE();
+  PROG_UART_CLK_DISABLE();
 #endif
   /* GPIO ports clock disable. */
   __HAL_RCC_GPIOG_CLK_DISABLE();

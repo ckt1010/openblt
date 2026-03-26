@@ -36,7 +36,9 @@
 #include "boot.h"                                      /* bootloader interface driver  */
 #include "led.h"                                       /* LED driver                   */
 #include "timer.h"                                     /* Timer driver                 */
+#if (BOOT_COM_NET_ENABLE > 0)
 #include "net.h"                                       /* TCP/IP server application    */
+#endif
 #include "shared_params.h"                             /* Shared parameters header.    */
 
 

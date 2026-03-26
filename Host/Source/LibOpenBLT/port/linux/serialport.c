@@ -106,7 +106,7 @@ bool SerialPortOpen(char const* portname, tSerialPortBaudrate baudrate,
 {
   bool result = false;
   struct termios options = { 0 }; 
-  int32_t iFlags;
+  int modemControl = TIOCM_DTR | TIOCM_RTS;
 
   /* Check parameters. */
   assert(portname != NULL);
@@ -134,6 +134,14 @@ bool SerialPortOpen(char const* portname, tSerialPortBaudrate baudrate,
         SerialPortClose();
         result = false;
       }
+    }
+    /* Make sure modem control lines stay low. This board uses an auto-download
+     * circuit on the ACM port, so asserting DTR/RTS can force entry into the
+     * STM32 ROM bootloader.
+     */
+    if (result)
+    {
+      (void)ioctl(portHandle, TIOCMBIC, &modemControl);
     }
     /* Get the current options for the port. */
     if (result)
@@ -175,6 +183,10 @@ bool SerialPortOpen(char const* portname, tSerialPortBaudrate baudrate,
       options.c_cflag &= ~(CSIZE | PARENB | PARODD);
       /* Control modes - set 8 bit chars. */
       options.c_cflag |= (CS8);
+      /* Keep the line local and enable the receiver. */
+      options.c_cflag |= (CLOCAL | CREAD);
+      /* Keep modem-control signals stable when the file descriptor closes. */
+      options.c_cflag &= ~(HUPCL);
       /* Control modes - set stop bits. Default is 1 stop bit. */
       if (stopbits == SERIALPORT_STOPBITS2)
       {
@@ -205,15 +217,9 @@ bool SerialPortOpen(char const* portname, tSerialPortBaudrate baudrate,
         SerialPortClose();
         result = false;
       }
-    }
-    /* Turn on DTR. */
-    if (result)
-    {
-      iFlags = TIOCM_DTR;
-      if (ioctl(portHandle, TIOCMBIS, &iFlags) == -1)
+      else
       {
-        SerialPortClose();
-        result = false;
+        (void)ioctl(portHandle, TIOCMBIC, &modemControl);
       }
     }
   }
@@ -232,6 +238,8 @@ void SerialPortClose(void)
   /* Close the port handle if valid. */
   if (portHandle != SERIALPORT_INVALID_HANDLE)
   {
+    int modemControl = TIOCM_DTR | TIOCM_RTS;
+    (void)ioctl(portHandle, TIOCMBIC, &modemControl);
     close(portHandle);
   }
   /* Invalidate handle. */
@@ -298,4 +306,3 @@ bool SerialPortRead(uint8_t * data, uint32_t length)
 
 
 /*********************************** end of serialport.c *******************************/
-

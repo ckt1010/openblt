@@ -68,7 +68,7 @@
  * configuring the IP address, network mask and gateway address are no longer needed.
  */
 /** \brief Enable/disable the NET transport layer. */
-#define BOOT_COM_NET_ENABLE               (1)
+#define BOOT_COM_NET_ENABLE               (0)
 /** \brief Configure the port that the TCP/IP server listens on */
 #define BOOT_COM_NET_PORT                 (1000)
 /** \brief Enable/disable DHCP client for automatically obtaining an IP address. */
@@ -124,7 +124,7 @@
  *
  */
 /** \brief Enable/disable CAN transport layer. */
-#define BOOT_COM_CAN_ENABLE             (1)
+#define BOOT_COM_CAN_ENABLE             (0)
 /** \brief Configure the desired CAN baudrate. */
 #define BOOT_COM_CAN_BAUDRATE           (500000)
 /** \brief Configure CAN message ID target->host. */
@@ -146,7 +146,9 @@
 /** \brief Configure the desired communication speed. */
 #define BOOT_COM_RS232_BAUDRATE          (57600)
 /** \brief Select the desired UART peripheral as a zero based index. */
-#define BOOT_COM_RS232_CHANNEL_INDEX     (0)
+#ifndef BOOT_COM_RS232_CHANNEL_INDEX
+#define BOOT_COM_RS232_CHANNEL_INDEX     (2)
+#endif
 
 
 /****************************************************************************************
@@ -162,6 +164,10 @@
  */
 /** \brief Enable/disable the backdoor override hook functions. */
 #define BOOT_BACKDOOR_HOOKS_ENABLE      (0)
+/** \brief Keep the entry window open long enough for host reconnection after the
+ *         application requests a reset into the bootloader.
+ */
+#define BOOT_BACKDOOR_ENTRY_TIMEOUT_MS  (5000)
 
 
 /****************************************************************************************

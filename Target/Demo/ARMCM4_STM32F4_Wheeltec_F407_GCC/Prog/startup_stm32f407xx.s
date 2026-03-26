@@ -222,6 +222,16 @@ g_pfnVectors:
   .word	CRYP_IRQHandler              			/* CRYP crypto global interrupt                                       */
   .word	HASH_RNG_IRQHandler          			/* Hash and Rng global interrupt                                      */
   .word	FPU_IRQHandler               			/* FPU interrupt                                                      */
+  .word  0                                   /* Reserved                                                           */
+  .word  0                                   /* Reserved                                                           */
+  .word  0                                   /* Reserved                                                           */
+  .word  0                                   /* Reserved                                                           */
+  .word  0                                   /* Reserved                                                           */
+  .word  0                                   /* Reserved                                                           */
+  .word  0                                   /* Reserved                                                           */
+  .word  0                                   /* Reserved                                                           */
+  .word  0                                   /* Reserved                                                           */
+  .word  0x55AA11EE                          /* Reserved for OpenBLT checksum                                   */
   .size g_pfnVectors, .-g_pfnVectors
 
 /*******************************************************************************

@@ -114,6 +114,8 @@ void BootActivate(void)
 ****************************************************************************************/
 /** \brief UART handle to be used in API calls. */
 static UART_HandleTypeDef rs232Handle;
+volatile unsigned long g_rs232_rx_hit_count = 0;
+volatile unsigned char g_rs232_last_rx_byte = 0;
 
 
 /****************************************************************************************
@@ -130,7 +132,21 @@ static unsigned char Rs232ReceiveByte(unsigned char *data);
 static void BootComRs232Init(void)
 {
   /* Configure UART peripheral. */
+#if (BOOT_COM_RS232_CHANNEL_INDEX == 0)
   rs232Handle.Instance = USART1;
+#elif (BOOT_COM_RS232_CHANNEL_INDEX == 1)
+  rs232Handle.Instance = USART2;
+#elif (BOOT_COM_RS232_CHANNEL_INDEX == 2)
+  rs232Handle.Instance = USART3;
+#elif (BOOT_COM_RS232_CHANNEL_INDEX == 3)
+  rs232Handle.Instance = UART4;
+#elif (BOOT_COM_RS232_CHANNEL_INDEX == 4)
+  rs232Handle.Instance = UART5;
+#elif (BOOT_COM_RS232_CHANNEL_INDEX == 5)
+  rs232Handle.Instance = USART6;
+#else
+#error "Unsupported BOOT_COM_RS232_CHANNEL_INDEX for demo application."
+#endif
   rs232Handle.Init.BaudRate = BOOT_COM_RS232_BAUDRATE;
   rs232Handle.Init.WordLength = UART_WORDLENGTH_8B;
   rs232Handle.Init.StopBits = UART_STOPBITS_1;
@@ -250,17 +266,15 @@ static void BootComRs232CheckActivationRequest(void)
 ****************************************************************************************/
 static unsigned char Rs232ReceiveByte(unsigned char *data)
 {
-  HAL_StatusTypeDef result;
-
-  /* receive a byte in a non-blocking manner */
-  result = HAL_UART_Receive(&rs232Handle, data, 1, 0);
-  /* process the result */
-  if (result == HAL_OK)
+  if (__HAL_UART_GET_FLAG(&rs232Handle, UART_FLAG_RXNE) != RESET)
   {
-    /* success */
+    /* Read the data register directly to match the bootloader's polling behavior. */
+    *data = (unsigned char)(rs232Handle.Instance->DR & 0xFFu);
+    g_rs232_last_rx_byte = *data;
+    g_rs232_rx_hit_count++;
     return 1;
   }
-  /* error occurred */
+
   return 0;
 } /*** end of Rs232ReceiveByte ***/
 #endif /* BOOT_COM_RS232_ENABLE > 0 */
