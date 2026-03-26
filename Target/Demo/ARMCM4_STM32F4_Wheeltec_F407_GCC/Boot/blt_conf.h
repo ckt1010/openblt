@@ -146,9 +146,7 @@
 /** \brief Configure the desired communication speed. */
 #define BOOT_COM_RS232_BAUDRATE          (57600)
 /** \brief Select the desired UART peripheral as a zero based index. */
-#ifndef BOOT_COM_RS232_CHANNEL_INDEX
 #define BOOT_COM_RS232_CHANNEL_INDEX     (2)
-#endif
 
 
 /****************************************************************************************

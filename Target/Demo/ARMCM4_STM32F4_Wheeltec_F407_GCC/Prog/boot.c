@@ -132,21 +132,7 @@ static unsigned char Rs232ReceiveByte(unsigned char *data);
 static void BootComRs232Init(void)
 {
   /* Configure UART peripheral. */
-#if (BOOT_COM_RS232_CHANNEL_INDEX == 0)
-  rs232Handle.Instance = USART1;
-#elif (BOOT_COM_RS232_CHANNEL_INDEX == 1)
-  rs232Handle.Instance = USART2;
-#elif (BOOT_COM_RS232_CHANNEL_INDEX == 2)
   rs232Handle.Instance = USART3;
-#elif (BOOT_COM_RS232_CHANNEL_INDEX == 3)
-  rs232Handle.Instance = UART4;
-#elif (BOOT_COM_RS232_CHANNEL_INDEX == 4)
-  rs232Handle.Instance = UART5;
-#elif (BOOT_COM_RS232_CHANNEL_INDEX == 5)
-  rs232Handle.Instance = USART6;
-#else
-#error "Unsupported BOOT_COM_RS232_CHANNEL_INDEX for demo application."
-#endif
   rs232Handle.Init.BaudRate = BOOT_COM_RS232_BAUDRATE;
   rs232Handle.Init.WordLength = UART_WORDLENGTH_8B;
   rs232Handle.Init.StopBits = UART_STOPBITS_1;
