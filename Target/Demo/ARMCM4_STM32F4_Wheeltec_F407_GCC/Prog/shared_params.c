@@ -100,16 +100,10 @@ typedef struct t_shared_params_buffer
  *           the first 192 (0xC0) bytes in RAM are reserved for the user program
  *           vector table.
  *
- *  \remark  This same approach can be applied with other toolchains such as Keil MDK
- *           and IAR EWARM. Consult the compiler and linker user manuals of your
- *           toolchain to find out how to place a RAM variable at a fixed memory address
- *           and to prevent the C-startup code from zeroing its contents.
- *           Here are a few links to get you started:
- *           * IAR EWARM:
- *               https://www.iar.com/support/tech-notes/compiler/
- *               linker-error-for-absolute-located-variable/
- *           * Keil MDK:
- *               http://www.keil.com/support/docs/3480.htm
+ *  \remark  Consult the GNU linker user manual if you need to adapt this approach for
+ *           a different memory layout. The key requirements are placing the shared RAM
+ *           variable at a fixed address and preventing the C-startup code from zeroing
+ *           its contents.
  */
 static tSharedParamsBuffer sharedParamsBuffer __attribute__ ((section (".shared")));
 
